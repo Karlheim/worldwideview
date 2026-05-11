@@ -239,7 +239,7 @@ export default function GlobeView() {
                 console.error(`[GlobeView] Synchronous error initializing plugin component ${managed.plugin.id}:`, err);
             }
         });
-        console.log(`[GlobeView] Recomputing PluginGlobeComponents. Count: ${components.length}`);
+        // console.log(`[GlobeView] Recomputing PluginGlobeComponents. Count: ${components.length}`);
         return components;
     }, [layers, viewerReady]);
 

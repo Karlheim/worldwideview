@@ -41,7 +41,7 @@ class WebSocketClient {
     engine.ws = new WebSocket(engineUrl);
 
     engine.ws.onopen = () => {
-      console.log(`[WSClient] Connected to ${engineUrl}`);
+      console.log(`[WSClient] 🟢 Connected to ${engineUrl}`);
       // Resubscribe to all active plugins on this engine
       for (const pluginId of engine.subscriptions) {
         this.send(engine, { action: "subscribe", pluginId });
@@ -50,11 +50,12 @@ class WebSocketClient {
 
     engine.ws.onmessage = (event) => {
       try {
+        console.log(`[WSClient] 📥 Received raw message:`, event.data.substring(0, 150) + (event.data.length > 150 ? '...' : ''));
         const data = JSON.parse(event.data);
 
         // Handle welcome message (informational, no action needed)
         if (data.type === "welcome") {
-          console.log(`[WSClient] Engine ${engineUrl} serves: ${data.plugins?.join(", ")}`);
+          console.log(`[WSClient] 👋 Engine ${engineUrl} serves: ${data.plugins?.join(", ")}`);
           return;
         }
 
@@ -98,6 +99,8 @@ class WebSocketClient {
       }));
     }
 
+    console.log(`[WSClient] 🔄 Dispatching ${finalEntities.length} entities for ${data.pluginId} to DataBus`);
+
     dataBus.emit("dataUpdated", {
       pluginId: data.pluginId!,
       entities: finalEntities,
@@ -111,6 +114,7 @@ class WebSocketClient {
   }
 
   public subscribe(pluginId: string, engineUrl: string) {
+    console.log(`[WSClient] 📡 Subscribing to ${pluginId} at ${engineUrl}`);
     const engine = this.getOrCreateEngine(engineUrl);
 
     // Cancel any pending cleanup

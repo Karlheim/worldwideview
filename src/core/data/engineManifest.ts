@@ -38,6 +38,7 @@ export async function fetchLocalEngineManifest(): Promise<string[] | null> {
     return localManifest;
   } catch {
     console.log("[EngineManifest] No local engine detected, using cloud.");
+    manifestFetched = false;
     return null;
   }
 }

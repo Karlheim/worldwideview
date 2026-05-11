@@ -148,11 +148,16 @@ class PluginManager {
     }
 
     async enablePlugin(pluginId: string): Promise<void> {
+        console.log(`[PluginManager] enablePlugin called for ${pluginId}`);
         // Ensure local manifest is fetched so we don't accidentally fall back to cloud if toggled too fast
         await fetchLocalEngineManifest();
+        console.log(`[PluginManager] Manifest fetched for ${pluginId}`);
 
         const managed = this.plugins.get(pluginId);
-        if (!managed) return;
+        if (!managed) {
+            console.error(`[PluginManager] Plugin ${pluginId} not found in managed plugins`);
+            return;
+        }
         managed.enabled = true;
 
         // Signal that data is loading
@@ -171,15 +176,21 @@ class PluginManager {
         }
 
         pollingManager.start(pluginId);
+        console.log(`[PluginManager] Emitting layerToggled true for ${pluginId}`);
         dataBus.emit("layerToggled", { pluginId, enabled: true });
     }
 
     disablePlugin(pluginId: string): void {
+        console.log(`[PluginManager] disablePlugin called for ${pluginId}`);
         const managed = this.plugins.get(pluginId);
-        if (!managed) return;
+        if (!managed) {
+            console.error(`[PluginManager] Plugin ${pluginId} not found during disable`);
+            return;
+        }
         managed.enabled = false;
         managed.entities = [];
         pollingManager.stop(pluginId);
+        console.log(`[PluginManager] Emitting layerToggled false for ${pluginId}`);
         dataBus.emit("layerToggled", { pluginId, enabled: false });
         dataBus.emit("dataUpdated", { pluginId, entities: [] });
     }
